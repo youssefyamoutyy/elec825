@@ -2,6 +2,7 @@ from tqdm import tqdm
 import PIL
 from PIL import Image, ImageFilter
 import pandas as pd
+import time
 import os,stat
 import numpy as np
 import tensorflow as tf
@@ -29,6 +30,7 @@ def load_data(folder):
     images.sort(key=lambda i: i[0])
     return np.array([v for _id, v in images])
 
+start = time.perf_counter()
 
 x_train = load_data('train')
 y_train = pd.read_csv('y_train.csv')['infection']
@@ -115,15 +117,23 @@ history = model.fit(x = x_train,
                     )
 model.save('models/MNIST_LeNet61.h5')
 model.summary()
+
+elapsed = time.perf_counter() - start
+
+print('Elapsed %.3f mins.' % (elapsed/60))
+t = time.localtime()
+timestamp = time.strftime('%d-%b-%Y_%H-%M-%S', t)
+tist =  timestamp
+
 #Plotting the Network Architecture
 tf.keras.utils.plot_model(
     model,
-    to_file="model.png",
+    to_file="models/Model_%d_epochs_%s.png"%(epochs,tist),
     show_shapes=True,
     show_layer_names=True,
-    rankdir="TB",
+    rankdir="LR",
     expand_nested=False,
-    dpi=96,
+    dpi=300,
 )
 ###Testing the model on a new dataset
 x_test = load_data('test')
